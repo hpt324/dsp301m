@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Dự đoán Rủi ro Thiên tai</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        h2 { color: #007bff; text-align: center; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input[type="number"], select { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #28a745; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; width: 100%; margin-top: 20px; font-size: 16px; }
+        button:hover { background-color: #218838; }
+        .result-box { margin-top: 30px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background-color: #e9ecef; }
+        .risk-item { margin-top: 10px; font-size: 1.1em; }
+        .risk-label { font-weight: bold; color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Dự đoán Rủi ro Thiên tai theo Vùng</h2>
+        <form method="POST">
+            <label for="vung">Chọn Vùng (Dữ liệu Gốc):</label>
+            <select id="vung" name="vung" required>
+                {% for region in regions %}
+                    <option value="{{ region }}">{{ region }}</option>
+                {% endfor %}
+            </select>
+            
+            <label for="nam">Năm (Ví dụ: 2026):</label>
+            <input type="number" id="nam" name="nam" min="2020" required>
+            
+            <label for="thang">Tháng:</label>
+            <select id="thang" name="thang" required>
+                {% for i in range(1, 13) %}
+                    <option value="{{ i }}">{{ i }}</option>
+                {% endfor %}
+            </select>
+            
+            <button type="submit">Dự đoán Rủi ro</button>
+        </form>
+
+        {% if results %}
+            <div class="result-box">
+                {% if results.error %}
+                    <p style="color: red; font-weight: bold;">Lỗi: {{ results.error }}</p>
+                {% else %}
+                    <h3>Dự báo cho Vùng {{ results.input_vung }}</h3>
+                    <p>Thời gian dự báo: Tháng {{ results.input_thang }} / Năm {{ results.input_nam }}</p>
+                    <hr>
+                    <h4>% Xác suất Xảy ra Thiên tai:</h4>
+                    {% for risk_type, proba in results.risks.items() %}
+                        <div class="risk-item">
+                            <span class="risk-label">{{ risk_type }}:</span> {{ proba }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
